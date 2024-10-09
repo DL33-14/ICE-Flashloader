@@ -1,0 +1,131 @@
+ARM GAS  /tmp/cc79vb5L.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "main.c"
+  20              		.section	.rodata.main.str1.4,"aMS",%progbits,1
+  21              		.align	2
+  22              	.LC0:
+  23 0000 6D61696E 		.ascii	"main()\012\000"
+  23      28290A00 
+  24              		.section	.text.main,"ax",%progbits
+  25              		.align	1
+  26              		.global	main
+  27              		.syntax unified
+  28              		.thumb
+  29              		.thumb_func
+  31              	main:
+  32              	.LFB0:
+   1:main.c        **** /* Includes ------------------------------------------------------------------*/
+   2:main.c        **** #include "task_mgr.h"
+   3:main.c        **** #include "SEGGER_RTT.h"
+   4:main.c        **** 
+   5:main.c        **** /* Private includes ----------------------------------------------------------*/
+   6:main.c        **** 
+   7:main.c        **** /* Private typedef -----------------------------------------------------------*/
+   8:main.c        **** 
+   9:main.c        **** /* Private define ------------------------------------------------------------*/
+  10:main.c        **** 
+  11:main.c        **** /* Private macro -------------------------------------------------------------*/
+  12:main.c        **** 
+  13:main.c        **** /* Private variables ---------------------------------------------------------*/
+  14:main.c        **** 
+  15:main.c        **** /* Private function prototypes -----------------------------------------------*/
+  16:main.c        **** 
+  17:main.c        **** /* Private function definitions -----------------------------------------------*/
+  18:main.c        **** 
+  19:main.c        **** 
+  20:main.c        **** /**
+  21:main.c        ****   * @brief  The application entry point.
+  22:main.c        ****   * @retval int
+  23:main.c        ****   */
+  24:main.c        **** int main(void)
+  25:main.c        **** {
+ARM GAS  /tmp/cc79vb5L.s 			page 2
+
+
+  33              		.loc 1 25 1 view -0
+  34              		.cfi_startproc
+  35              		@ Volatile: function does not return.
+  36              		@ args = 0, pretend = 0, frame = 0
+  37              		@ frame_needed = 0, uses_anonymous_args = 0
+  38 0000 08B5     		push	{r3, lr}
+  39              	.LCFI0:
+  40              		.cfi_def_cfa_offset 8
+  41              		.cfi_offset 3, -8
+  42              		.cfi_offset 14, -4
+  26:main.c        ****   /* MCU Configuration--------------------------------------------------------*/
+  27:main.c        ****   SEGGER_RTT_printf(0, "main()\n");
+  43              		.loc 1 27 3 view .LVU1
+  44 0002 0549     		ldr	r1, .L4
+  45 0004 0020     		movs	r0, #0
+  46 0006 FFF7FEFF 		bl	SEGGER_RTT_printf
+  47              	.LVL0:
+  28:main.c        **** 
+  29:main.c        ****   taskMgr_initMcu();
+  48              		.loc 1 29 3 view .LVU2
+  49 000a FFF7FEFF 		bl	taskMgr_initMcu
+  50              	.LVL1:
+  30:main.c        ****   taskMgr_queueTask();
+  51              		.loc 1 30 3 view .LVU3
+  52 000e FFF7FEFF 		bl	taskMgr_queueTask
+  53              	.LVL2:
+  31:main.c        **** 
+  32:main.c        ****   taskMgr_startTask();
+  54              		.loc 1 32 3 view .LVU4
+  55 0012 FFF7FEFF 		bl	taskMgr_startTask
+  56              	.LVL3:
+  57              	.L2:
+  33:main.c        **** 
+  34:main.c        ****   /* Infinite loop */
+  35:main.c        ****   while (1)
+  58              		.loc 1 35 3 view .LVU5
+  36:main.c        ****   {
+  37:main.c        **** 
+  38:main.c        ****   }
+  59              		.loc 1 38 3 view .LVU6
+  35:main.c        ****   {
+  60              		.loc 1 35 9 view .LVU7
+  61 0016 FEE7     		b	.L2
+  62              	.L5:
+  63              		.align	2
+  64              	.L4:
+  65 0018 00000000 		.word	.LC0
+  66              		.cfi_endproc
+  67              	.LFE0:
+  69              		.text
+  70              	.Letext0:
+  71              		.file 2 "App/utils/inc/task_mgr.h"
+  72              		.file 3 "segger/rtt/inc/SEGGER_RTT.h"
+ARM GAS  /tmp/cc79vb5L.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+     /tmp/cc79vb5L.s:21     .rodata.main.str1.4:00000000 $d
+     /tmp/cc79vb5L.s:25     .text.main:00000000 $t
+     /tmp/cc79vb5L.s:31     .text.main:00000000 main
+     /tmp/cc79vb5L.s:65     .text.main:00000018 $d
+
+UNDEFINED SYMBOLS
+SEGGER_RTT_printf
+taskMgr_initMcu
+taskMgr_queueTask
+taskMgr_startTask

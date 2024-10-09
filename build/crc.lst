@@ -1,0 +1,248 @@
+ARM GAS  /tmp/ccCzFHug.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"crc.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "STM32F411/Peripherals/src/crc.c"
+  20              		.section	.text.MX_CRC_Init,"ax",%progbits
+  21              		.align	1
+  22              		.global	MX_CRC_Init
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	MX_CRC_Init:
+  28              	.LFB134:
+   1:STM32F411/Peripherals/src/crc.c **** /* Includes ------------------------------------------------------------------*/
+   2:STM32F411/Peripherals/src/crc.c **** #include "crc.h"
+   3:STM32F411/Peripherals/src/crc.c **** #include "utils.h"
+   4:STM32F411/Peripherals/src/crc.c **** 
+   5:STM32F411/Peripherals/src/crc.c **** /* Private Variable Declaration ---------------------------------------------*/
+   6:STM32F411/Peripherals/src/crc.c **** CRC_HandleTypeDef hcrc;
+   7:STM32F411/Peripherals/src/crc.c **** 
+   8:STM32F411/Peripherals/src/crc.c **** /* Public Function Definition ------------------------------------------------------------------*/
+   9:STM32F411/Peripherals/src/crc.c **** /* CRC init function */
+  10:STM32F411/Peripherals/src/crc.c **** void MX_CRC_Init(void)
+  11:STM32F411/Peripherals/src/crc.c **** {
+  29              		.loc 1 11 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 08B5     		push	{r3, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
+  12:STM32F411/Peripherals/src/crc.c ****   hcrc.Instance = CRC;
+  38              		.loc 1 12 3 view .LVU1
+  39              		.loc 1 12 17 is_stmt 0 view .LVU2
+  40 0002 0548     		ldr	r0, .L5
+  41 0004 054B     		ldr	r3, .L5+4
+  42 0006 0360     		str	r3, [r0]
+  13:STM32F411/Peripherals/src/crc.c ****   if (HAL_CRC_Init(&hcrc) != HAL_OK)
+  43              		.loc 1 13 3 is_stmt 1 view .LVU3
+  44              		.loc 1 13 7 is_stmt 0 view .LVU4
+  45 0008 FFF7FEFF 		bl	HAL_CRC_Init
+ARM GAS  /tmp/ccCzFHug.s 			page 2
+
+
+  46              	.LVL0:
+  47              		.loc 1 13 6 discriminator 1 view .LVU5
+  48 000c 00B9     		cbnz	r0, .L4
+  49              	.L1:
+  14:STM32F411/Peripherals/src/crc.c ****   {
+  15:STM32F411/Peripherals/src/crc.c ****     Error_Handler();
+  16:STM32F411/Peripherals/src/crc.c ****   }
+  17:STM32F411/Peripherals/src/crc.c **** 
+  18:STM32F411/Peripherals/src/crc.c **** }
+  50              		.loc 1 18 1 view .LVU6
+  51 000e 08BD     		pop	{r3, pc}
+  52              	.L4:
+  15:STM32F411/Peripherals/src/crc.c ****   }
+  53              		.loc 1 15 5 is_stmt 1 view .LVU7
+  54 0010 FFF7FEFF 		bl	Error_Handler
+  55              	.LVL1:
+  56              		.loc 1 18 1 is_stmt 0 view .LVU8
+  57 0014 FBE7     		b	.L1
+  58              	.L6:
+  59 0016 00BF     		.align	2
+  60              	.L5:
+  61 0018 00000000 		.word	hcrc
+  62 001c 00300240 		.word	1073885184
+  63              		.cfi_endproc
+  64              	.LFE134:
+  66              		.section	.text.HAL_CRC_MspInit,"ax",%progbits
+  67              		.align	1
+  68              		.global	HAL_CRC_MspInit
+  69              		.syntax unified
+  70              		.thumb
+  71              		.thumb_func
+  73              	HAL_CRC_MspInit:
+  74              	.LVL2:
+  75              	.LFB135:
+  19:STM32F411/Peripherals/src/crc.c **** 
+  20:STM32F411/Peripherals/src/crc.c **** /* Private Function Definition ------------------------------------------------------------------*/
+  21:STM32F411/Peripherals/src/crc.c **** void HAL_CRC_MspInit(CRC_HandleTypeDef* crcHandle)
+  22:STM32F411/Peripherals/src/crc.c **** {
+  76              		.loc 1 22 1 is_stmt 1 view -0
+  77              		.cfi_startproc
+  78              		@ args = 0, pretend = 0, frame = 8
+  79              		@ frame_needed = 0, uses_anonymous_args = 0
+  80              		@ link register save eliminated.
+  23:STM32F411/Peripherals/src/crc.c **** 
+  24:STM32F411/Peripherals/src/crc.c ****   if(crcHandle->Instance==CRC)
+  81              		.loc 1 24 3 view .LVU10
+  82              		.loc 1 24 15 is_stmt 0 view .LVU11
+  83 0000 0268     		ldr	r2, [r0]
+  84              		.loc 1 24 5 view .LVU12
+  85 0002 094B     		ldr	r3, .L14
+  86 0004 9A42     		cmp	r2, r3
+  87 0006 00D0     		beq	.L13
+  88 0008 7047     		bx	lr
+  89              	.L13:
+  22:STM32F411/Peripherals/src/crc.c **** 
+  90              		.loc 1 22 1 view .LVU13
+  91 000a 82B0     		sub	sp, sp, #8
+ARM GAS  /tmp/ccCzFHug.s 			page 3
+
+
+  92              	.LCFI1:
+  93              		.cfi_def_cfa_offset 8
+  25:STM32F411/Peripherals/src/crc.c ****   {
+  26:STM32F411/Peripherals/src/crc.c ****     /* CRC clock enable */
+  27:STM32F411/Peripherals/src/crc.c ****     __HAL_RCC_CRC_CLK_ENABLE();
+  94              		.loc 1 27 5 is_stmt 1 view .LVU14
+  95              	.LBB2:
+  96              		.loc 1 27 5 view .LVU15
+  97 000c 0023     		movs	r3, #0
+  98 000e 0193     		str	r3, [sp, #4]
+  99              		.loc 1 27 5 view .LVU16
+ 100 0010 064B     		ldr	r3, .L14+4
+ 101 0012 1A6B     		ldr	r2, [r3, #48]
+ 102 0014 42F48052 		orr	r2, r2, #4096
+ 103 0018 1A63     		str	r2, [r3, #48]
+ 104              		.loc 1 27 5 view .LVU17
+ 105 001a 1B6B     		ldr	r3, [r3, #48]
+ 106 001c 03F48053 		and	r3, r3, #4096
+ 107 0020 0193     		str	r3, [sp, #4]
+ 108              		.loc 1 27 5 view .LVU18
+ 109 0022 019B     		ldr	r3, [sp, #4]
+ 110              	.LBE2:
+ 111              		.loc 1 27 5 discriminator 1 view .LVU19
+  28:STM32F411/Peripherals/src/crc.c ****   }
+  29:STM32F411/Peripherals/src/crc.c **** }
+ 112              		.loc 1 29 1 is_stmt 0 view .LVU20
+ 113 0024 02B0     		add	sp, sp, #8
+ 114              	.LCFI2:
+ 115              		.cfi_def_cfa_offset 0
+ 116              		@ sp needed
+ 117 0026 7047     		bx	lr
+ 118              	.L15:
+ 119              		.align	2
+ 120              	.L14:
+ 121 0028 00300240 		.word	1073885184
+ 122 002c 00380240 		.word	1073887232
+ 123              		.cfi_endproc
+ 124              	.LFE135:
+ 126              		.section	.text.HAL_CRC_MspDeInit,"ax",%progbits
+ 127              		.align	1
+ 128              		.global	HAL_CRC_MspDeInit
+ 129              		.syntax unified
+ 130              		.thumb
+ 131              		.thumb_func
+ 133              	HAL_CRC_MspDeInit:
+ 134              	.LVL3:
+ 135              	.LFB136:
+  30:STM32F411/Peripherals/src/crc.c **** 
+  31:STM32F411/Peripherals/src/crc.c **** void HAL_CRC_MspDeInit(CRC_HandleTypeDef* crcHandle)
+  32:STM32F411/Peripherals/src/crc.c **** {
+ 136              		.loc 1 32 1 is_stmt 1 view -0
+ 137              		.cfi_startproc
+ 138              		@ args = 0, pretend = 0, frame = 0
+ 139              		@ frame_needed = 0, uses_anonymous_args = 0
+ 140              		@ link register save eliminated.
+  33:STM32F411/Peripherals/src/crc.c **** 
+  34:STM32F411/Peripherals/src/crc.c ****   if(crcHandle->Instance==CRC)
+ARM GAS  /tmp/ccCzFHug.s 			page 4
+
+
+ 141              		.loc 1 34 3 view .LVU22
+ 142              		.loc 1 34 15 is_stmt 0 view .LVU23
+ 143 0000 0268     		ldr	r2, [r0]
+ 144              		.loc 1 34 5 view .LVU24
+ 145 0002 054B     		ldr	r3, .L19
+ 146 0004 9A42     		cmp	r2, r3
+ 147 0006 00D0     		beq	.L18
+ 148              	.L16:
+  35:STM32F411/Peripherals/src/crc.c ****   {
+  36:STM32F411/Peripherals/src/crc.c ****     /* Peripheral clock disable */
+  37:STM32F411/Peripherals/src/crc.c ****     __HAL_RCC_CRC_CLK_DISABLE();
+  38:STM32F411/Peripherals/src/crc.c ****   }
+  39:STM32F411/Peripherals/src/crc.c **** }
+ 149              		.loc 1 39 1 view .LVU25
+ 150 0008 7047     		bx	lr
+ 151              	.L18:
+  37:STM32F411/Peripherals/src/crc.c ****   }
+ 152              		.loc 1 37 5 is_stmt 1 view .LVU26
+ 153 000a 044A     		ldr	r2, .L19+4
+ 154 000c 136B     		ldr	r3, [r2, #48]
+ 155 000e 23F48053 		bic	r3, r3, #4096
+ 156 0012 1363     		str	r3, [r2, #48]
+ 157              		.loc 1 39 1 is_stmt 0 view .LVU27
+ 158 0014 F8E7     		b	.L16
+ 159              	.L20:
+ 160 0016 00BF     		.align	2
+ 161              	.L19:
+ 162 0018 00300240 		.word	1073885184
+ 163 001c 00380240 		.word	1073887232
+ 164              		.cfi_endproc
+ 165              	.LFE136:
+ 167              		.global	hcrc
+ 168              		.section	.bss.hcrc,"aw",%nobits
+ 169              		.align	2
+ 172              	hcrc:
+ 173 0000 00000000 		.space	8
+ 173      00000000 
+ 174              		.text
+ 175              	.Letext0:
+ 176              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
+ 177              		.file 3 "STM32F411/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f411xe.h"
+ 178              		.file 4 "STM32F411/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 179              		.file 5 "STM32F411/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_crc.h"
+ 180              		.file 6 "STM32F411/Peripherals/inc/crc.h"
+ 181              		.file 7 "App/utils/inc/utils.h"
+ARM GAS  /tmp/ccCzFHug.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 crc.c
+     /tmp/ccCzFHug.s:21     .text.MX_CRC_Init:00000000 $t
+     /tmp/ccCzFHug.s:27     .text.MX_CRC_Init:00000000 MX_CRC_Init
+     /tmp/ccCzFHug.s:61     .text.MX_CRC_Init:00000018 $d
+     /tmp/ccCzFHug.s:172    .bss.hcrc:00000000 hcrc
+     /tmp/ccCzFHug.s:67     .text.HAL_CRC_MspInit:00000000 $t
+     /tmp/ccCzFHug.s:73     .text.HAL_CRC_MspInit:00000000 HAL_CRC_MspInit
+     /tmp/ccCzFHug.s:121    .text.HAL_CRC_MspInit:00000028 $d
+     /tmp/ccCzFHug.s:127    .text.HAL_CRC_MspDeInit:00000000 $t
+     /tmp/ccCzFHug.s:133    .text.HAL_CRC_MspDeInit:00000000 HAL_CRC_MspDeInit
+     /tmp/ccCzFHug.s:162    .text.HAL_CRC_MspDeInit:00000018 $d
+     /tmp/ccCzFHug.s:169    .bss.hcrc:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_CRC_Init
+Error_Handler

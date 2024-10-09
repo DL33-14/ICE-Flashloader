@@ -1,0 +1,246 @@
+ARM GAS  /tmp/ccKvtJBL.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usb_mgr.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "App/usb/src/usb_mgr.c"
+  20              		.section	.rodata.usbMgr_mainThread.str1.4,"aMS",%progbits,1
+  21              		.align	2
+  22              	.LC0:
+  23 0000 55534220 		.ascii	"USB mgr Started\000"
+  23      6D677220 
+  23      53746172 
+  23      74656400 
+  24              		.section	.text.usbMgr_mainThread,"ax",%progbits
+  25              		.align	1
+  26              		.syntax unified
+  27              		.thumb
+  28              		.thumb_func
+  30              	usbMgr_mainThread:
+  31              	.LVL0:
+  32              	.LFB5:
+   1:App/usb/src/usb_mgr.c **** /**
+   2:App/usb/src/usb_mgr.c ****   ******************************************************************************
+   3:App/usb/src/usb_mgr.c ****   * @file           : usb_mgr.c
+   4:App/usb/src/usb_mgr.c ****   * @version        : v0.1
+   5:App/usb/src/usb_mgr.c ****   * @brief          : Main USB app
+   6:App/usb/src/usb_mgr.c ****   ******************************************************************************
+   7:App/usb/src/usb_mgr.c **** */
+   8:App/usb/src/usb_mgr.c **** /* Includes ------------------------------------------------------------------*/
+   9:App/usb/src/usb_mgr.c **** #include "FreeRTOS.h"
+  10:App/usb/src/usb_mgr.c **** #include "cmsis_os.h"
+  11:App/usb/src/usb_mgr.c **** #include "task.h"
+  12:App/usb/src/usb_mgr.c **** 
+  13:App/usb/src/usb_mgr.c **** #include "utils.h"
+  14:App/usb/src/usb_mgr.c **** 
+  15:App/usb/src/usb_mgr.c **** #include "usb_ctrl.h"
+  16:App/usb/src/usb_mgr.c **** 
+  17:App/usb/src/usb_mgr.c **** /* Defines -------------------------------------------------------------------*/
+  18:App/usb/src/usb_mgr.c **** 
+  19:App/usb/src/usb_mgr.c **** /* Private Typedef -----------------------------------------------------------*/
+  20:App/usb/src/usb_mgr.c **** typedef enum
+  21:App/usb/src/usb_mgr.c **** {
+  22:App/usb/src/usb_mgr.c ****     INIT,
+  23:App/usb/src/usb_mgr.c **** 
+ARM GAS  /tmp/ccKvtJBL.s 			page 2
+
+
+  24:App/usb/src/usb_mgr.c **** }tUsbMgr_state;
+  25:App/usb/src/usb_mgr.c **** 
+  26:App/usb/src/usb_mgr.c **** /* Private Variable Declaration ----------------------------------------------*/
+  27:App/usb/src/usb_mgr.c **** osThreadId_t mUsbMgr_taskHandle;
+  28:App/usb/src/usb_mgr.c **** 
+  29:App/usb/src/usb_mgr.c **** const osThreadAttr_t usbMgr_taskAttributes = {
+  30:App/usb/src/usb_mgr.c ****   .name = "USB Manager",
+  31:App/usb/src/usb_mgr.c ****   .stack_size = 128 * 4,
+  32:App/usb/src/usb_mgr.c ****   .priority = (osPriority_t) osPriorityNormal,
+  33:App/usb/src/usb_mgr.c **** };
+  34:App/usb/src/usb_mgr.c **** 
+  35:App/usb/src/usb_mgr.c **** /* Private Function Declaration ----------------------------------------------*/
+  36:App/usb/src/usb_mgr.c **** static void usbMgr_mainThread(void *argument);
+  37:App/usb/src/usb_mgr.c **** static void usbMgr_init(void);
+  38:App/usb/src/usb_mgr.c **** 
+  39:App/usb/src/usb_mgr.c **** /* Public Function Defnition -------------------------------------------------*/
+  40:App/usb/src/usb_mgr.c **** void usbMgr_queueTask( void )
+  41:App/usb/src/usb_mgr.c **** {
+  42:App/usb/src/usb_mgr.c ****     mUsbMgr_taskHandle = osThreadNew(usbMgr_mainThread, NULL, &usbMgr_taskAttributes);
+  43:App/usb/src/usb_mgr.c ****     utils_printLog("Usb task queued");
+  44:App/usb/src/usb_mgr.c **** }
+  45:App/usb/src/usb_mgr.c **** 
+  46:App/usb/src/usb_mgr.c **** /* Private Function Definition -----------------------------------------------*/
+  47:App/usb/src/usb_mgr.c **** static void usbMgr_mainThread(void *argument)
+  48:App/usb/src/usb_mgr.c **** {
+  33              		.loc 1 48 1 view -0
+  34              		.cfi_startproc
+  35              		@ Volatile: function does not return.
+  36              		@ args = 0, pretend = 0, frame = 0
+  37              		@ frame_needed = 0, uses_anonymous_args = 0
+  38              		.loc 1 48 1 is_stmt 0 view .LVU1
+  39 0000 08B5     		push	{r3, lr}
+  40              	.LCFI0:
+  41              		.cfi_def_cfa_offset 8
+  42              		.cfi_offset 3, -8
+  43              		.cfi_offset 14, -4
+  49:App/usb/src/usb_mgr.c **** 
+  50:App/usb/src/usb_mgr.c ****     utils_printLog("USB mgr Started");
+  44              		.loc 1 50 5 is_stmt 1 view .LVU2
+  45 0002 0448     		ldr	r0, .L4
+  46              	.LVL1:
+  47              		.loc 1 50 5 is_stmt 0 view .LVU3
+  48 0004 FFF7FEFF 		bl	utils_printLog
+  49              	.LVL2:
+  51:App/usb/src/usb_mgr.c **** 
+  52:App/usb/src/usb_mgr.c ****     usbCtrl_init();
+  50              		.loc 1 52 5 is_stmt 1 view .LVU4
+  51 0008 FFF7FEFF 		bl	usbCtrl_init
+  52              	.LVL3:
+  53              	.L2:
+  53:App/usb/src/usb_mgr.c **** 
+  54:App/usb/src/usb_mgr.c ****     for(;;)
+  54              		.loc 1 54 5 view .LVU5
+  55:App/usb/src/usb_mgr.c ****     {
+  56:App/usb/src/usb_mgr.c ****         osDelay(1);
+  55              		.loc 1 56 9 discriminator 1 view .LVU6
+  56 000c 0120     		movs	r0, #1
+ARM GAS  /tmp/ccKvtJBL.s 			page 3
+
+
+  57 000e FFF7FEFF 		bl	osDelay
+  58              	.LVL4:
+  54:App/usb/src/usb_mgr.c ****     {
+  59              		.loc 1 54 5 view .LVU7
+  60 0012 FBE7     		b	.L2
+  61              	.L5:
+  62              		.align	2
+  63              	.L4:
+  64 0014 00000000 		.word	.LC0
+  65              		.cfi_endproc
+  66              	.LFE5:
+  68              		.section	.rodata.usbMgr_queueTask.str1.4,"aMS",%progbits,1
+  69              		.align	2
+  70              	.LC1:
+  71 0000 55736220 		.ascii	"Usb task queued\000"
+  71      7461736B 
+  71      20717565 
+  71      75656400 
+  72              		.section	.text.usbMgr_queueTask,"ax",%progbits
+  73              		.align	1
+  74              		.global	usbMgr_queueTask
+  75              		.syntax unified
+  76              		.thumb
+  77              		.thumb_func
+  79              	usbMgr_queueTask:
+  80              	.LFB4:
+  41:App/usb/src/usb_mgr.c ****     mUsbMgr_taskHandle = osThreadNew(usbMgr_mainThread, NULL, &usbMgr_taskAttributes);
+  81              		.loc 1 41 1 view -0
+  82              		.cfi_startproc
+  83              		@ args = 0, pretend = 0, frame = 0
+  84              		@ frame_needed = 0, uses_anonymous_args = 0
+  85 0000 08B5     		push	{r3, lr}
+  86              	.LCFI1:
+  87              		.cfi_def_cfa_offset 8
+  88              		.cfi_offset 3, -8
+  89              		.cfi_offset 14, -4
+  42:App/usb/src/usb_mgr.c ****     utils_printLog("Usb task queued");
+  90              		.loc 1 42 5 view .LVU9
+  42:App/usb/src/usb_mgr.c ****     utils_printLog("Usb task queued");
+  91              		.loc 1 42 26 is_stmt 0 view .LVU10
+  92 0002 054A     		ldr	r2, .L8
+  93 0004 0021     		movs	r1, #0
+  94 0006 0548     		ldr	r0, .L8+4
+  95 0008 FFF7FEFF 		bl	osThreadNew
+  96              	.LVL5:
+  42:App/usb/src/usb_mgr.c ****     utils_printLog("Usb task queued");
+  97              		.loc 1 42 24 discriminator 1 view .LVU11
+  98 000c 044B     		ldr	r3, .L8+8
+  99 000e 1860     		str	r0, [r3]
+  43:App/usb/src/usb_mgr.c **** }
+ 100              		.loc 1 43 5 is_stmt 1 view .LVU12
+ 101 0010 0448     		ldr	r0, .L8+12
+ 102 0012 FFF7FEFF 		bl	utils_printLog
+ 103              	.LVL6:
+  44:App/usb/src/usb_mgr.c **** 
+ 104              		.loc 1 44 1 is_stmt 0 view .LVU13
+ 105 0016 08BD     		pop	{r3, pc}
+ARM GAS  /tmp/ccKvtJBL.s 			page 4
+
+
+ 106              	.L9:
+ 107              		.align	2
+ 108              	.L8:
+ 109 0018 00000000 		.word	usbMgr_taskAttributes
+ 110 001c 00000000 		.word	usbMgr_mainThread
+ 111 0020 00000000 		.word	mUsbMgr_taskHandle
+ 112 0024 00000000 		.word	.LC1
+ 113              		.cfi_endproc
+ 114              	.LFE4:
+ 116              		.global	usbMgr_taskAttributes
+ 117              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 118              		.align	2
+ 119              	.LC2:
+ 120 0000 55534220 		.ascii	"USB Manager\000"
+ 120      4D616E61 
+ 120      67657200 
+ 121              		.section	.rodata.usbMgr_taskAttributes,"a"
+ 122              		.align	2
+ 125              	usbMgr_taskAttributes:
+ 126 0000 00000000 		.word	.LC2
+ 127 0004 00000000 		.space	16
+ 127      00000000 
+ 127      00000000 
+ 127      00000000 
+ 128 0014 00020000 		.word	512
+ 129 0018 18000000 		.word	24
+ 130 001c 00000000 		.space	8
+ 130      00000000 
+ 131              		.global	mUsbMgr_taskHandle
+ 132              		.section	.bss.mUsbMgr_taskHandle,"aw",%nobits
+ 133              		.align	2
+ 136              	mUsbMgr_taskHandle:
+ 137 0000 00000000 		.space	4
+ 138              		.text
+ 139              	.Letext0:
+ 140              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
+ 141              		.file 3 "STM32F411/Middlewares/thirdparty/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h"
+ 142              		.file 4 "App/usb/inc/usb_ctrl.h"
+ 143              		.file 5 "App/utils/inc/utils.h"
+ARM GAS  /tmp/ccKvtJBL.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usb_mgr.c
+     /tmp/ccKvtJBL.s:21     .rodata.usbMgr_mainThread.str1.4:00000000 $d
+     /tmp/ccKvtJBL.s:25     .text.usbMgr_mainThread:00000000 $t
+     /tmp/ccKvtJBL.s:30     .text.usbMgr_mainThread:00000000 usbMgr_mainThread
+     /tmp/ccKvtJBL.s:64     .text.usbMgr_mainThread:00000014 $d
+     /tmp/ccKvtJBL.s:69     .rodata.usbMgr_queueTask.str1.4:00000000 $d
+     /tmp/ccKvtJBL.s:73     .text.usbMgr_queueTask:00000000 $t
+     /tmp/ccKvtJBL.s:79     .text.usbMgr_queueTask:00000000 usbMgr_queueTask
+     /tmp/ccKvtJBL.s:109    .text.usbMgr_queueTask:00000018 $d
+     /tmp/ccKvtJBL.s:125    .rodata.usbMgr_taskAttributes:00000000 usbMgr_taskAttributes
+     /tmp/ccKvtJBL.s:136    .bss.mUsbMgr_taskHandle:00000000 mUsbMgr_taskHandle
+     /tmp/ccKvtJBL.s:118    .rodata.str1.4:00000000 $d
+     /tmp/ccKvtJBL.s:122    .rodata.usbMgr_taskAttributes:00000000 $d
+     /tmp/ccKvtJBL.s:133    .bss.mUsbMgr_taskHandle:00000000 $d
+
+UNDEFINED SYMBOLS
+utils_printLog
+usbCtrl_init
+osDelay
+osThreadNew

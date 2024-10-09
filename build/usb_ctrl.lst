@@ -1,0 +1,679 @@
+ARM GAS  /tmp/ccN6Nob1.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usb_ctrl.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "App/usb/src/usb_ctrl.c"
+  20              		.section	.text.usb_deInit,"ax",%progbits
+  21              		.align	1
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	usb_deInit:
+  27              	.LFB140:
+   1:App/usb/src/usb_ctrl.c **** /**
+   2:App/usb/src/usb_ctrl.c ****   ******************************************************************************
+   3:App/usb/src/usb_ctrl.c ****   * @file           : usb_ctrl.c
+   4:App/usb/src/usb_ctrl.c ****   * @version        : v0.1
+   5:App/usb/src/usb_ctrl.c ****   * @brief          : USB HAL interface
+   6:App/usb/src/usb_ctrl.c ****   ******************************************************************************
+   7:App/usb/src/usb_ctrl.c **** */
+   8:App/usb/src/usb_ctrl.c **** 
+   9:App/usb/src/usb_ctrl.c **** /* Includes ------------------------------------------------------------------*/
+  10:App/usb/src/usb_ctrl.c **** #include "usbd_cdc.h"
+  11:App/usb/src/usb_ctrl.c **** #include "usbd_desc.h"
+  12:App/usb/src/usb_ctrl.c **** #include "usbd_core.h"
+  13:App/usb/src/usb_ctrl.c **** #include "usb_ctrl.h"
+  14:App/usb/src/usb_ctrl.c **** #include "utils.h"
+  15:App/usb/src/usb_ctrl.c **** 
+  16:App/usb/src/usb_ctrl.c **** /* Defines -------------------------------------------------------------------*/
+  17:App/usb/src/usb_ctrl.c **** #define APP_RX_DATA_SIZE  2048
+  18:App/usb/src/usb_ctrl.c **** #define APP_TX_DATA_SIZE  2048
+  19:App/usb/src/usb_ctrl.c **** 
+  20:App/usb/src/usb_ctrl.c **** /* Private Typedef -----------------------------------------------------------*/
+  21:App/usb/src/usb_ctrl.c **** 
+  22:App/usb/src/usb_ctrl.c **** /* Private Function Declaration ----------------------------------------------*/
+  23:App/usb/src/usb_ctrl.c **** static int8_t usb_init(void);
+  24:App/usb/src/usb_ctrl.c **** static int8_t usb_deInit(void);
+  25:App/usb/src/usb_ctrl.c **** static int8_t usb_control(uint8_t cmd, uint8_t* pbuf, uint16_t length);
+  26:App/usb/src/usb_ctrl.c **** static int8_t usb_receive(uint8_t* pbuf, uint32_t *Len);
+  27:App/usb/src/usb_ctrl.c **** static int8_t usb_transmitCplt(uint8_t *pbuf, uint32_t *Len, uint8_t epnum);
+  28:App/usb/src/usb_ctrl.c **** 
+  29:App/usb/src/usb_ctrl.c **** /* Private Variable Declaration ----------------------------------------------*/
+  30:App/usb/src/usb_ctrl.c **** static uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
+  31:App/usb/src/usb_ctrl.c **** static uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
+ARM GAS  /tmp/ccN6Nob1.s 			page 2
+
+
+  32:App/usb/src/usb_ctrl.c **** USBD_HandleTypeDef hUsbDeviceFS;
+  33:App/usb/src/usb_ctrl.c **** 
+  34:App/usb/src/usb_ctrl.c **** /* Public Variable Declaration -----------------------------------------------*/
+  35:App/usb/src/usb_ctrl.c **** USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
+  36:App/usb/src/usb_ctrl.c **** {
+  37:App/usb/src/usb_ctrl.c ****   usb_init,
+  38:App/usb/src/usb_ctrl.c ****   usb_deInit,
+  39:App/usb/src/usb_ctrl.c ****   usb_control,
+  40:App/usb/src/usb_ctrl.c ****   usb_receive,
+  41:App/usb/src/usb_ctrl.c ****   usb_transmitCplt
+  42:App/usb/src/usb_ctrl.c **** };
+  43:App/usb/src/usb_ctrl.c **** 
+  44:App/usb/src/usb_ctrl.c **** /* Public Function Defnition -------------------------------------------------*/
+  45:App/usb/src/usb_ctrl.c **** void usbCtrl_init(void)
+  46:App/usb/src/usb_ctrl.c **** {
+  47:App/usb/src/usb_ctrl.c ****     utils_printLog("Usb ctrl init");
+  48:App/usb/src/usb_ctrl.c ****     if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
+  49:App/usb/src/usb_ctrl.c ****     {
+  50:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_Init");
+  51:App/usb/src/usb_ctrl.c ****       Error_Handler();
+  52:App/usb/src/usb_ctrl.c ****     }
+  53:App/usb/src/usb_ctrl.c ****     if (USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
+  54:App/usb/src/usb_ctrl.c ****     {
+  55:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_RegisterClass");
+  56:App/usb/src/usb_ctrl.c ****       Error_Handler();
+  57:App/usb/src/usb_ctrl.c ****     }
+  58:App/usb/src/usb_ctrl.c ****     if (USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS) != USBD_OK)
+  59:App/usb/src/usb_ctrl.c ****     {
+  60:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_CDC_RegisterInterface");
+  61:App/usb/src/usb_ctrl.c ****       Error_Handler();
+  62:App/usb/src/usb_ctrl.c ****     }
+  63:App/usb/src/usb_ctrl.c ****     if (USBD_Start(&hUsbDeviceFS) != USBD_OK)
+  64:App/usb/src/usb_ctrl.c ****     {
+  65:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_Start");
+  66:App/usb/src/usb_ctrl.c ****       Error_Handler();
+  67:App/usb/src/usb_ctrl.c ****     }
+  68:App/usb/src/usb_ctrl.c ****     utils_printLog("Usb ctrl init done");
+  69:App/usb/src/usb_ctrl.c **** }
+  70:App/usb/src/usb_ctrl.c **** 
+  71:App/usb/src/usb_ctrl.c **** /* Private Function Definition ----------------------------------------------*/
+  72:App/usb/src/usb_ctrl.c **** static int8_t usb_init(void)
+  73:App/usb/src/usb_ctrl.c **** {
+  74:App/usb/src/usb_ctrl.c ****   /* Set Application Buffers */
+  75:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
+  76:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
+  77:App/usb/src/usb_ctrl.c ****   return (USBD_OK);
+  78:App/usb/src/usb_ctrl.c **** }
+  79:App/usb/src/usb_ctrl.c **** 
+  80:App/usb/src/usb_ctrl.c **** static int8_t usb_deInit(void)
+  81:App/usb/src/usb_ctrl.c **** {
+  28              		.loc 1 81 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  82:App/usb/src/usb_ctrl.c ****   return (USBD_OK);
+  33              		.loc 1 82 3 view .LVU1
+ARM GAS  /tmp/ccN6Nob1.s 			page 3
+
+
+  83:App/usb/src/usb_ctrl.c **** }
+  34              		.loc 1 83 1 is_stmt 0 view .LVU2
+  35 0000 0020     		movs	r0, #0
+  36 0002 7047     		bx	lr
+  37              		.cfi_endproc
+  38              	.LFE140:
+  40              		.section	.text.usb_control,"ax",%progbits
+  41              		.align	1
+  42              		.syntax unified
+  43              		.thumb
+  44              		.thumb_func
+  46              	usb_control:
+  47              	.LVL0:
+  48              	.LFB141:
+  84:App/usb/src/usb_ctrl.c **** 
+  85:App/usb/src/usb_ctrl.c **** static int8_t usb_control(uint8_t cmd, uint8_t* pbuf, uint16_t length)
+  86:App/usb/src/usb_ctrl.c **** {
+  49              		.loc 1 86 1 is_stmt 1 view -0
+  50              		.cfi_startproc
+  51              		@ args = 0, pretend = 0, frame = 0
+  52              		@ frame_needed = 0, uses_anonymous_args = 0
+  53              		@ link register save eliminated.
+  87:App/usb/src/usb_ctrl.c ****     UNUSED(cmd);
+  54              		.loc 1 87 5 view .LVU4
+  88:App/usb/src/usb_ctrl.c ****     UNUSED(pbuf);
+  55              		.loc 1 88 5 view .LVU5
+  89:App/usb/src/usb_ctrl.c ****     UNUSED(length);
+  56              		.loc 1 89 5 view .LVU6
+  90:App/usb/src/usb_ctrl.c **** 
+  91:App/usb/src/usb_ctrl.c ****   return (USBD_OK);
+  57              		.loc 1 91 3 view .LVU7
+  92:App/usb/src/usb_ctrl.c **** }
+  58              		.loc 1 92 1 is_stmt 0 view .LVU8
+  59 0000 0020     		movs	r0, #0
+  60              	.LVL1:
+  61              		.loc 1 92 1 view .LVU9
+  62 0002 7047     		bx	lr
+  63              		.cfi_endproc
+  64              	.LFE141:
+  66              		.section	.text.usb_transmitCplt,"ax",%progbits
+  67              		.align	1
+  68              		.syntax unified
+  69              		.thumb
+  70              		.thumb_func
+  72              	usb_transmitCplt:
+  73              	.LVL2:
+  74              	.LFB144:
+  93:App/usb/src/usb_ctrl.c **** 
+  94:App/usb/src/usb_ctrl.c **** static int8_t usb_receive(uint8_t* Buf, uint32_t *Len)
+  95:App/usb/src/usb_ctrl.c **** {
+  96:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+  97:App/usb/src/usb_ctrl.c ****   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  98:App/usb/src/usb_ctrl.c ****   return (USBD_OK);
+  99:App/usb/src/usb_ctrl.c **** }
+ 100:App/usb/src/usb_ctrl.c **** 
+ 101:App/usb/src/usb_ctrl.c **** int8_t usb_Transmit(uint8_t* Buf, uint16_t Len)
+ 102:App/usb/src/usb_ctrl.c **** {
+ARM GAS  /tmp/ccN6Nob1.s 			page 4
+
+
+ 103:App/usb/src/usb_ctrl.c ****   uint8_t result = USBD_OK;
+ 104:App/usb/src/usb_ctrl.c ****   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+ 105:App/usb/src/usb_ctrl.c ****   if (hcdc->TxState != 0){
+ 106:App/usb/src/usb_ctrl.c ****     return USBD_BUSY;
+ 107:App/usb/src/usb_ctrl.c ****   }
+ 108:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+ 109:App/usb/src/usb_ctrl.c ****   result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+ 110:App/usb/src/usb_ctrl.c ****   return result;
+ 111:App/usb/src/usb_ctrl.c **** }
+ 112:App/usb/src/usb_ctrl.c **** 
+ 113:App/usb/src/usb_ctrl.c **** static int8_t usb_transmitCplt(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
+ 114:App/usb/src/usb_ctrl.c **** {
+  75              		.loc 1 114 1 is_stmt 1 view -0
+  76              		.cfi_startproc
+  77              		@ args = 0, pretend = 0, frame = 0
+  78              		@ frame_needed = 0, uses_anonymous_args = 0
+  79              		@ link register save eliminated.
+ 115:App/usb/src/usb_ctrl.c ****   uint8_t result = USBD_OK;
+  80              		.loc 1 115 3 view .LVU11
+ 116:App/usb/src/usb_ctrl.c ****   UNUSED(Buf);
+  81              		.loc 1 116 3 view .LVU12
+ 117:App/usb/src/usb_ctrl.c ****   UNUSED(Len);
+  82              		.loc 1 117 3 view .LVU13
+ 118:App/usb/src/usb_ctrl.c ****   UNUSED(epnum);
+  83              		.loc 1 118 3 view .LVU14
+ 119:App/usb/src/usb_ctrl.c ****   return result;
+  84              		.loc 1 119 3 view .LVU15
+ 120:App/usb/src/usb_ctrl.c **** }...
+  85              		.loc 1 120 1 is_stmt 0 view .LVU16
+  86 0000 0020     		movs	r0, #0
+  87              	.LVL3:
+  88              		.loc 1 120 1 view .LVU17
+  89 0002 7047     		bx	lr
+  90              		.cfi_endproc
+  91              	.LFE144:
+  93              		.section	.text.usb_receive,"ax",%progbits
+  94              		.align	1
+  95              		.syntax unified
+  96              		.thumb
+  97              		.thumb_func
+  99              	usb_receive:
+ 100              	.LVL4:
+ 101              	.LFB142:
+  95:App/usb/src/usb_ctrl.c **** {
+ 102              		.loc 1 95 1 is_stmt 1 view -0
+ 103              		.cfi_startproc
+ 104              		@ args = 0, pretend = 0, frame = 0
+ 105              		@ frame_needed = 0, uses_anonymous_args = 0
+  95:App/usb/src/usb_ctrl.c **** {
+ 106              		.loc 1 95 1 is_stmt 0 view .LVU19
+ 107 0000 10B5     		push	{r4, lr}
+ 108              	.LCFI0:
+ 109              		.cfi_def_cfa_offset 8
+ 110              		.cfi_offset 4, -8
+ 111              		.cfi_offset 14, -4
+ 112 0002 0146     		mov	r1, r0
+ 113              	.LVL5:
+ARM GAS  /tmp/ccN6Nob1.s 			page 5
+
+
+  96:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+ 114              		.loc 1 96 3 is_stmt 1 view .LVU20
+ 115 0004 044C     		ldr	r4, .L6
+ 116 0006 2046     		mov	r0, r4
+ 117              	.LVL6:
+  96:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+ 118              		.loc 1 96 3 is_stmt 0 view .LVU21
+ 119 0008 FFF7FEFF 		bl	USBD_CDC_SetRxBuffer
+ 120              	.LVL7:
+  97:App/usb/src/usb_ctrl.c ****   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+ 121              		.loc 1 97 3 is_stmt 1 view .LVU22
+ 122 000c 2046     		mov	r0, r4
+ 123 000e FFF7FEFF 		bl	USBD_CDC_ReceivePacket
+ 124              	.LVL8:
+  98:App/usb/src/usb_ctrl.c ****   return (USBD_OK);
+ 125              		.loc 1 98 3 view .LVU23
+  99:App/usb/src/usb_ctrl.c **** }
+ 126              		.loc 1 99 1 is_stmt 0 view .LVU24
+ 127 0012 0020     		movs	r0, #0
+ 128 0014 10BD     		pop	{r4, pc}
+ 129              	.L7:
+ 130 0016 00BF     		.align	2
+ 131              	.L6:
+ 132 0018 00000000 		.word	hUsbDeviceFS
+ 133              		.cfi_endproc
+ 134              	.LFE142:
+ 136              		.section	.text.usb_init,"ax",%progbits
+ 137              		.align	1
+ 138              		.syntax unified
+ 139              		.thumb
+ 140              		.thumb_func
+ 142              	usb_init:
+ 143              	.LFB139:
+  73:App/usb/src/usb_ctrl.c **** {
+ 144              		.loc 1 73 1 is_stmt 1 view -0
+ 145              		.cfi_startproc
+ 146              		@ args = 0, pretend = 0, frame = 0
+ 147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 148 0000 10B5     		push	{r4, lr}
+ 149              	.LCFI1:
+ 150              		.cfi_def_cfa_offset 8
+ 151              		.cfi_offset 4, -8
+ 152              		.cfi_offset 14, -4
+  75:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
+ 153              		.loc 1 75 3 view .LVU26
+ 154 0002 064C     		ldr	r4, .L10
+ 155 0004 0022     		movs	r2, #0
+ 156 0006 0649     		ldr	r1, .L10+4
+ 157 0008 2046     		mov	r0, r4
+ 158 000a FFF7FEFF 		bl	USBD_CDC_SetTxBuffer
+ 159              	.LVL9:
+  76:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
+ 160              		.loc 1 76 3 view .LVU27
+ 161 000e 0549     		ldr	r1, .L10+8
+ 162 0010 2046     		mov	r0, r4
+ 163 0012 FFF7FEFF 		bl	USBD_CDC_SetRxBuffer
+ 164              	.LVL10:
+ARM GAS  /tmp/ccN6Nob1.s 			page 6
+
+
+  77:App/usb/src/usb_ctrl.c ****   return (USBD_OK);
+ 165              		.loc 1 77 3 view .LVU28
+  78:App/usb/src/usb_ctrl.c **** }
+ 166              		.loc 1 78 1 is_stmt 0 view .LVU29
+ 167 0016 0020     		movs	r0, #0
+ 168 0018 10BD     		pop	{r4, pc}
+ 169              	.L11:
+ 170 001a 00BF     		.align	2
+ 171              	.L10:
+ 172 001c 00000000 		.word	hUsbDeviceFS
+ 173 0020 00000000 		.word	UserTxBufferFS
+ 174 0024 00000000 		.word	UserRxBufferFS
+ 175              		.cfi_endproc
+ 176              	.LFE139:
+ 178              		.section	.rodata.usbCtrl_init.str1.4,"aMS",%progbits,1
+ 179              		.align	2
+ 180              	.LC0:
+ 181 0000 55736220 		.ascii	"Usb ctrl init\000"
+ 181      6374726C 
+ 181      20696E69 
+ 181      7400
+ 182 000e 0000     		.align	2
+ 183              	.LC1:
+ 184 0010 55534244 		.ascii	"USBD_Init\000"
+ 184      5F496E69 
+ 184      7400
+ 185 001a 0000     		.align	2
+ 186              	.LC2:
+ 187 001c 55534244 		.ascii	"USBD_RegisterClass\000"
+ 187      5F526567 
+ 187      69737465 
+ 187      72436C61 
+ 187      737300
+ 188 002f 00       		.align	2
+ 189              	.LC3:
+ 190 0030 55534244 		.ascii	"USBD_CDC_RegisterInterface\000"
+ 190      5F434443 
+ 190      5F526567 
+ 190      69737465 
+ 190      72496E74 
+ 191 004b 00       		.align	2
+ 192              	.LC4:
+ 193 004c 55534244 		.ascii	"USBD_Start\000"
+ 193      5F537461 
+ 193      727400
+ 194 0057 00       		.align	2
+ 195              	.LC5:
+ 196 0058 55736220 		.ascii	"Usb ctrl init done\000"
+ 196      6374726C 
+ 196      20696E69 
+ 196      7420646F 
+ 196      6E6500
+ 197              		.section	.text.usbCtrl_init,"ax",%progbits
+ 198              		.align	1
+ 199              		.global	usbCtrl_init
+ 200              		.syntax unified
+ 201              		.thumb
+ARM GAS  /tmp/ccN6Nob1.s 			page 7
+
+
+ 202              		.thumb_func
+ 204              	usbCtrl_init:
+ 205              	.LFB138:
+  46:App/usb/src/usb_ctrl.c **** {
+ 206              		.loc 1 46 1 is_stmt 1 view -0
+ 207              		.cfi_startproc
+ 208              		@ args = 0, pretend = 0, frame = 0
+ 209              		@ frame_needed = 0, uses_anonymous_args = 0
+ 210 0000 08B5     		push	{r3, lr}
+ 211              	.LCFI2:
+ 212              		.cfi_def_cfa_offset 8
+ 213              		.cfi_offset 3, -8
+ 214              		.cfi_offset 14, -4
+  47:App/usb/src/usb_ctrl.c ****     utils_printLog("Usb ctrl init");
+ 215              		.loc 1 47 5 view .LVU31
+ 216 0002 1948     		ldr	r0, .L22
+ 217 0004 FFF7FEFF 		bl	utils_printLog
+ 218              	.LVL11:
+  48:App/usb/src/usb_ctrl.c ****     if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
+ 219              		.loc 1 48 5 view .LVU32
+  48:App/usb/src/usb_ctrl.c ****     if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
+ 220              		.loc 1 48 9 is_stmt 0 view .LVU33
+ 221 0008 0022     		movs	r2, #0
+ 222 000a 1849     		ldr	r1, .L22+4
+ 223 000c 1848     		ldr	r0, .L22+8
+ 224 000e FFF7FEFF 		bl	USBD_Init
+ 225              	.LVL12:
+  48:App/usb/src/usb_ctrl.c ****     if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
+ 226              		.loc 1 48 8 discriminator 1 view .LVU34
+ 227 0012 88B9     		cbnz	r0, .L18
+ 228              	.L13:
+  53:App/usb/src/usb_ctrl.c ****     if (USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
+ 229              		.loc 1 53 5 is_stmt 1 view .LVU35
+  53:App/usb/src/usb_ctrl.c ****     if (USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
+ 230              		.loc 1 53 9 is_stmt 0 view .LVU36
+ 231 0014 1749     		ldr	r1, .L22+12
+ 232 0016 1648     		ldr	r0, .L22+8
+ 233 0018 FFF7FEFF 		bl	USBD_RegisterClass
+ 234              	.LVL13:
+  53:App/usb/src/usb_ctrl.c ****     if (USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
+ 235              		.loc 1 53 8 discriminator 1 view .LVU37
+ 236 001c 90B9     		cbnz	r0, .L19
+ 237              	.L14:
+  58:App/usb/src/usb_ctrl.c ****     if (USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS) != USBD_OK)
+ 238              		.loc 1 58 5 is_stmt 1 view .LVU38
+  58:App/usb/src/usb_ctrl.c ****     if (USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS) != USBD_OK)
+ 239              		.loc 1 58 9 is_stmt 0 view .LVU39
+ 240 001e 1649     		ldr	r1, .L22+16
+ 241 0020 1348     		ldr	r0, .L22+8
+ 242 0022 FFF7FEFF 		bl	USBD_CDC_RegisterInterface
+ 243              	.LVL14:
+  58:App/usb/src/usb_ctrl.c ****     if (USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS) != USBD_OK)
+ 244              		.loc 1 58 8 discriminator 1 view .LVU40
+ 245 0026 98B9     		cbnz	r0, .L20
+ 246              	.L15:
+  63:App/usb/src/usb_ctrl.c ****     if (USBD_Start(&hUsbDeviceFS) != USBD_OK)
+ 247              		.loc 1 63 5 is_stmt 1 view .LVU41
+ARM GAS  /tmp/ccN6Nob1.s 			page 8
+
+
+  63:App/usb/src/usb_ctrl.c ****     if (USBD_Start(&hUsbDeviceFS) != USBD_OK)
+ 248              		.loc 1 63 9 is_stmt 0 view .LVU42
+ 249 0028 1148     		ldr	r0, .L22+8
+ 250 002a FFF7FEFF 		bl	USBD_Start
+ 251              	.LVL15:
+  63:App/usb/src/usb_ctrl.c ****     if (USBD_Start(&hUsbDeviceFS) != USBD_OK)
+ 252              		.loc 1 63 8 discriminator 1 view .LVU43
+ 253 002e A8B9     		cbnz	r0, .L21
+ 254              	.L16:
+  68:App/usb/src/usb_ctrl.c ****     utils_printLog("Usb ctrl init done");
+ 255              		.loc 1 68 5 is_stmt 1 view .LVU44
+ 256 0030 1248     		ldr	r0, .L22+20
+ 257 0032 FFF7FEFF 		bl	utils_printLog
+ 258              	.LVL16:
+  69:App/usb/src/usb_ctrl.c **** }
+ 259              		.loc 1 69 1 is_stmt 0 view .LVU45
+ 260 0036 08BD     		pop	{r3, pc}
+ 261              	.L18:
+  50:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_Init");
+ 262              		.loc 1 50 7 is_stmt 1 view .LVU46
+ 263 0038 1148     		ldr	r0, .L22+24
+ 264 003a FFF7FEFF 		bl	utils_printLog
+ 265              	.LVL17:
+  51:App/usb/src/usb_ctrl.c ****       Error_Handler();
+ 266              		.loc 1 51 7 view .LVU47
+ 267 003e FFF7FEFF 		bl	Error_Handler
+ 268              	.LVL18:
+ 269 0042 E7E7     		b	.L13
+ 270              	.L19:
+  55:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_RegisterClass");
+ 271              		.loc 1 55 7 view .LVU48
+ 272 0044 0F48     		ldr	r0, .L22+28
+ 273 0046 FFF7FEFF 		bl	utils_printLog
+ 274              	.LVL19:
+  56:App/usb/src/usb_ctrl.c ****       Error_Handler();
+ 275              		.loc 1 56 7 view .LVU49
+ 276 004a FFF7FEFF 		bl	Error_Handler
+ 277              	.LVL20:
+ 278 004e E6E7     		b	.L14
+ 279              	.L20:
+  60:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_CDC_RegisterInterface");
+ 280              		.loc 1 60 7 view .LVU50
+ 281 0050 0D48     		ldr	r0, .L22+32
+ 282 0052 FFF7FEFF 		bl	utils_printLog
+ 283              	.LVL21:
+  61:App/usb/src/usb_ctrl.c ****       Error_Handler();
+ 284              		.loc 1 61 7 view .LVU51
+ 285 0056 FFF7FEFF 		bl	Error_Handler
+ 286              	.LVL22:
+ 287 005a E5E7     		b	.L15
+ 288              	.L21:
+  65:App/usb/src/usb_ctrl.c ****       utils_printLog("USBD_Start");
+ 289              		.loc 1 65 7 view .LVU52
+ 290 005c 0B48     		ldr	r0, .L22+36
+ 291 005e FFF7FEFF 		bl	utils_printLog
+ 292              	.LVL23:
+  66:App/usb/src/usb_ctrl.c ****       Error_Handler();
+ARM GAS  /tmp/ccN6Nob1.s 			page 9
+
+
+ 293              		.loc 1 66 7 view .LVU53
+ 294 0062 FFF7FEFF 		bl	Error_Handler
+ 295              	.LVL24:
+ 296 0066 E3E7     		b	.L16
+ 297              	.L23:
+ 298              		.align	2
+ 299              	.L22:
+ 300 0068 00000000 		.word	.LC0
+ 301 006c 00000000 		.word	FS_Desc
+ 302 0070 00000000 		.word	hUsbDeviceFS
+ 303 0074 00000000 		.word	USBD_CDC
+ 304 0078 00000000 		.word	USBD_Interface_fops_FS
+ 305 007c 58000000 		.word	.LC5
+ 306 0080 10000000 		.word	.LC1
+ 307 0084 1C000000 		.word	.LC2
+ 308 0088 30000000 		.word	.LC3
+ 309 008c 4C000000 		.word	.LC4
+ 310              		.cfi_endproc
+ 311              	.LFE138:
+ 313              		.section	.text.usb_Transmit,"ax",%progbits
+ 314              		.align	1
+ 315              		.global	usb_Transmit
+ 316              		.syntax unified
+ 317              		.thumb
+ 318              		.thumb_func
+ 320              	usb_Transmit:
+ 321              	.LVL25:
+ 322              	.LFB143:
+ 102:App/usb/src/usb_ctrl.c **** {
+ 323              		.loc 1 102 1 view -0
+ 324              		.cfi_startproc
+ 325              		@ args = 0, pretend = 0, frame = 0
+ 326              		@ frame_needed = 0, uses_anonymous_args = 0
+ 103:App/usb/src/usb_ctrl.c ****   uint8_t result = USBD_OK;
+ 327              		.loc 1 103 3 view .LVU55
+ 104:App/usb/src/usb_ctrl.c ****   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+ 328              		.loc 1 104 3 view .LVU56
+ 104:App/usb/src/usb_ctrl.c ****   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+ 329              		.loc 1 104 27 is_stmt 0 view .LVU57
+ 330 0000 094B     		ldr	r3, .L32
+ 331 0002 D3F8BC32 		ldr	r3, [r3, #700]
+ 332              	.LVL26:
+ 105:App/usb/src/usb_ctrl.c ****   if (hcdc->TxState != 0){
+ 333              		.loc 1 105 3 is_stmt 1 view .LVU58
+ 105:App/usb/src/usb_ctrl.c ****   if (hcdc->TxState != 0){
+ 334              		.loc 1 105 11 is_stmt 0 view .LVU59
+ 335 0006 D3F81432 		ldr	r3, [r3, #532]
+ 336              	.LVL27:
+ 105:App/usb/src/usb_ctrl.c ****   if (hcdc->TxState != 0){
+ 337              		.loc 1 105 6 view .LVU60
+ 338 000a 0BB1     		cbz	r3, .L31
+ 106:App/usb/src/usb_ctrl.c ****     return USBD_BUSY;
+ 339              		.loc 1 106 12 view .LVU61
+ 340 000c 0120     		movs	r0, #1
+ 341              	.LVL28:
+ 111:App/usb/src/usb_ctrl.c **** }
+ 342              		.loc 1 111 1 view .LVU62
+ARM GAS  /tmp/ccN6Nob1.s 			page 10
+
+
+ 343 000e 7047     		bx	lr
+ 344              	.LVL29:
+ 345              	.L31:
+ 102:App/usb/src/usb_ctrl.c **** {
+ 346              		.loc 1 102 1 view .LVU63
+ 347 0010 10B5     		push	{r4, lr}
+ 348              	.LCFI3:
+ 349              		.cfi_def_cfa_offset 8
+ 350              		.cfi_offset 4, -8
+ 351              		.cfi_offset 14, -4
+ 108:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+ 352              		.loc 1 108 3 is_stmt 1 view .LVU64
+ 353 0012 054C     		ldr	r4, .L32
+ 354 0014 0A46     		mov	r2, r1
+ 355 0016 0146     		mov	r1, r0
+ 356              	.LVL30:
+ 108:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+ 357              		.loc 1 108 3 is_stmt 0 view .LVU65
+ 358 0018 2046     		mov	r0, r4
+ 359              	.LVL31:
+ 108:App/usb/src/usb_ctrl.c ****   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+ 360              		.loc 1 108 3 view .LVU66
+ 361 001a FFF7FEFF 		bl	USBD_CDC_SetTxBuffer
+ 362              	.LVL32:
+ 109:App/usb/src/usb_ctrl.c ****   result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+ 363              		.loc 1 109 3 is_stmt 1 view .LVU67
+ 109:App/usb/src/usb_ctrl.c ****   result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+ 364              		.loc 1 109 12 is_stmt 0 view .LVU68
+ 365 001e 2046     		mov	r0, r4
+ 366 0020 FFF7FEFF 		bl	USBD_CDC_TransmitPacket
+ 367              	.LVL33:
+ 110:App/usb/src/usb_ctrl.c ****   return result;
+ 368              		.loc 1 110 3 is_stmt 1 view .LVU69
+ 110:App/usb/src/usb_ctrl.c ****   return result;
+ 369              		.loc 1 110 10 is_stmt 0 view .LVU70
+ 370 0024 40B2     		sxtb	r0, r0
+ 111:App/usb/src/usb_ctrl.c **** }
+ 371              		.loc 1 111 1 view .LVU71
+ 372 0026 10BD     		pop	{r4, pc}
+ 373              	.L33:
+ 374              		.align	2
+ 375              	.L32:
+ 376 0028 00000000 		.word	hUsbDeviceFS
+ 377              		.cfi_endproc
+ 378              	.LFE143:
+ 380              		.global	USBD_Interface_fops_FS
+ 381              		.section	.data.USBD_Interface_fops_FS,"aw"
+ 382              		.align	2
+ 385              	USBD_Interface_fops_FS:
+ 386 0000 00000000 		.word	usb_init
+ 387 0004 00000000 		.word	usb_deInit
+ 388 0008 00000000 		.word	usb_control
+ 389 000c 00000000 		.word	usb_receive
+ 390 0010 00000000 		.word	usb_transmitCplt
+ 391              		.global	hUsbDeviceFS
+ 392              		.section	.bss.hUsbDeviceFS,"aw",%nobits
+ 393              		.align	2
+ARM GAS  /tmp/ccN6Nob1.s 			page 11
+
+
+ 396              	hUsbDeviceFS:
+ 397 0000 00000000 		.space	732
+ 397      00000000 
+ 397      00000000 
+ 397      00000000 
+ 397      00000000 
+ 398              		.section	.bss.UserTxBufferFS,"aw",%nobits
+ 399              		.align	2
+ 402              	UserTxBufferFS:
+ 403 0000 00000000 		.space	2048
+ 403      00000000 
+ 403      00000000 
+ 403      00000000 
+ 403      00000000 
+ 404              		.section	.bss.UserRxBufferFS,"aw",%nobits
+ 405              		.align	2
+ 408              	UserRxBufferFS:
+ 409 0000 00000000 		.space	2048
+ 409      00000000 
+ 409      00000000 
+ 409      00000000 
+ 409      00000000 
+ 410              		.text
+ 411              	.Letext0:
+ 412              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
+ 413              		.file 3 "STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h"
+ 414              		.file 4 "STM32F411/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h"
+ 415              		.file 5 "App/usb/inc/usbd_desc.h"
+ 416              		.file 6 "STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h"
+ 417              		.file 7 "App/utils/inc/utils.h"
+ARM GAS  /tmp/ccN6Nob1.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usb_ctrl.c
+     /tmp/ccN6Nob1.s:21     .text.usb_deInit:00000000 $t
+     /tmp/ccN6Nob1.s:26     .text.usb_deInit:00000000 usb_deInit
+     /tmp/ccN6Nob1.s:41     .text.usb_control:00000000 $t
+     /tmp/ccN6Nob1.s:46     .text.usb_control:00000000 usb_control
+     /tmp/ccN6Nob1.s:67     .text.usb_transmitCplt:00000000 $t
+     /tmp/ccN6Nob1.s:72     .text.usb_transmitCplt:00000000 usb_transmitCplt
+     /tmp/ccN6Nob1.s:94     .text.usb_receive:00000000 $t
+     /tmp/ccN6Nob1.s:99     .text.usb_receive:00000000 usb_receive
+     /tmp/ccN6Nob1.s:132    .text.usb_receive:00000018 $d
+     /tmp/ccN6Nob1.s:396    .bss.hUsbDeviceFS:00000000 hUsbDeviceFS
+     /tmp/ccN6Nob1.s:137    .text.usb_init:00000000 $t
+     /tmp/ccN6Nob1.s:142    .text.usb_init:00000000 usb_init
+     /tmp/ccN6Nob1.s:172    .text.usb_init:0000001c $d
+     /tmp/ccN6Nob1.s:402    .bss.UserTxBufferFS:00000000 UserTxBufferFS
+     /tmp/ccN6Nob1.s:408    .bss.UserRxBufferFS:00000000 UserRxBufferFS
+     /tmp/ccN6Nob1.s:179    .rodata.usbCtrl_init.str1.4:00000000 $d
+     /tmp/ccN6Nob1.s:198    .text.usbCtrl_init:00000000 $t
+     /tmp/ccN6Nob1.s:204    .text.usbCtrl_init:00000000 usbCtrl_init
+     /tmp/ccN6Nob1.s:300    .text.usbCtrl_init:00000068 $d
+     /tmp/ccN6Nob1.s:385    .data.USBD_Interface_fops_FS:00000000 USBD_Interface_fops_FS
+     /tmp/ccN6Nob1.s:314    .text.usb_Transmit:00000000 $t
+     /tmp/ccN6Nob1.s:320    .text.usb_Transmit:00000000 usb_Transmit
+     /tmp/ccN6Nob1.s:376    .text.usb_Transmit:00000028 $d
+     /tmp/ccN6Nob1.s:382    .data.USBD_Interface_fops_FS:00000000 $d
+     /tmp/ccN6Nob1.s:393    .bss.hUsbDeviceFS:00000000 $d
+     /tmp/ccN6Nob1.s:399    .bss.UserTxBufferFS:00000000 $d
+     /tmp/ccN6Nob1.s:405    .bss.UserRxBufferFS:00000000 $d
+
+UNDEFINED SYMBOLS
+USBD_CDC_SetRxBuffer
+USBD_CDC_ReceivePacket
+USBD_CDC_SetTxBuffer
+utils_printLog
+USBD_Init
+USBD_RegisterClass
+USBD_CDC_RegisterInterface
+USBD_Start
+Error_Handler
+FS_Desc
+USBD_CDC
+USBD_CDC_TransmitPacket
