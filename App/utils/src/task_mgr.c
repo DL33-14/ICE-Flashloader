@@ -7,7 +7,6 @@
 
 #include "utils.h"
 
-#include "usb_mgr.h"
 /* Defines -------------------------------------------------------------------*/
 
 /* Private Typedef -----------------------------------------------------------*/
@@ -35,7 +34,6 @@ void taskMgr_initMcu( void )
 
 void taskMgr_queueTask( void )
 {
-    usbMgr_queueTask();
     utils_printLog("task queued");
 }
 
