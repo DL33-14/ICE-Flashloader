@@ -86,10 +86,6 @@ segger/rtt/src/SEGGER_RTT_Syscalls_GCC.c \
 App/utils/src/utils.c \
 App/utils/src/task_mgr.c \
 main.c \
-App/usb/src/usb_mgr.c \
-App/usb/src/usb_ctrl.c \
-App/usb/src/usbd_desc.c \
-App/usb/config/usbd_conf.c \
 
 
 # ASM sources
