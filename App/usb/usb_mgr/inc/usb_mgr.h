@@ -3,19 +3,20 @@
 #define __USB_MGR_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc.h"
 
-/* Defines -------------------------------------------------------------------*/
+    /* Defines -------------------------------------------------------------------*/
 
-/* Public Typedef -----------------------------------------------------------*/
+    /* Public Typedef -----------------------------------------------------------*/
 
-/* Public Variable Declaration ----------------------------------------------*/
+    /* Public Variable Declaration ----------------------------------------------*/
 
-/* Public Function Declaration ----------------------------------------------*/
-void usbMgr_queueTask( void );
+    /* Public Function Declaration ----------------------------------------------*/
+    void usbMgr_queueTask(void);
 
 #ifdef __cplusplus
 }
