@@ -55,7 +55,11 @@ STM32F411/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_crc.c \
 STM32F411/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 STM32F411/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 STM32F411/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
-STM32F411/Peripherals/src/system_stm32f4xx.c \
+STM32F411/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c \
+STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
+STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
+STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
+STM32F411/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c  \
 STM32F411/Middlewares/thirdparty/FreeRTOS/Source/croutine.c \
 STM32F411/Middlewares/thirdparty/FreeRTOS/Source/event_groups.c \
 STM32F411/Middlewares/thirdparty/FreeRTOS/Source/list.c \
@@ -74,6 +78,7 @@ STM32F411/Peripherals/src/clock.c \
 STM32F411/Peripherals/src/gpio.c \
 STM32F411/Peripherals/src/syscalls.c \
 STM32F411/Peripherals/src/sysmem.c \
+STM32F411/Peripherals/src/system_stm32f4xx.c \
 STM32F411/Peripherals/src/stm32f4xx_hal_timebase_tim.c \
 segger/rtt/src/SEGGER_RTT.c \
 segger/rtt/src/SEGGER_RTT_printf.c \
@@ -81,11 +86,10 @@ segger/rtt/src/SEGGER_RTT_Syscalls_GCC.c \
 App/utils/src/utils.c \
 App/utils/src/task_mgr.c \
 main.c \
-# STM32F411/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c \
-STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
-STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
-STM32F411/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
-STM32F411/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c  \
+App/usb/usb_ctrl/src/usb_device.c \
+App/usb/usb_ctrl/src/usbd_cdc_if.c \
+App/usb/usb_ctrl/src/usbd_desc.c \
+App/usb/usb_mgr/src/usb_mgr.c \
 
 
 # ASM sources
