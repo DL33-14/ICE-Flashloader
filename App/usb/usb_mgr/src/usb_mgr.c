@@ -12,7 +12,7 @@
 
 #include "utils.h"
 
-#include "usb_ctrl.h"
+#include "usb_device.h"
 
 /* Defines -------------------------------------------------------------------*/
 
