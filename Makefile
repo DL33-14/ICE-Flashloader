@@ -89,6 +89,7 @@ main.c \
 App/usb/usb_ctrl/src/usb_device.c \
 App/usb/usb_ctrl/src/usbd_cdc_if.c \
 App/usb/usb_ctrl/src/usbd_desc.c \
+App/usb/usb_ctrl/config/usbd_conf.c \
 App/usb/usb_mgr/src/usb_mgr.c \
 
 
@@ -163,6 +164,9 @@ C_INCLUDES =  \
 -Isegger/rtt/inc \
 -IApp/utils/inc \
 -Iconfig \
+-IApp/usb/usb_ctrl/inc \
+-IApp/usb/usb_mgr/inc \
+-IApp/usb/usb_ctrl/config
 
 
 # compile gcc flags
